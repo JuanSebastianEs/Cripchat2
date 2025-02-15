@@ -33,5 +33,24 @@ Def plot_data(df, japan_cpi)
     ax1-legend(loc="upper left")
 
     ax2 = ax1.twinx()
-    ax2.plot(df.index, df["close
+    ax2.plot(japan_cpi.index, japan_cpi, label="Inflación en Japón (CPI)", color="red")
+    ax2.set_ylabel("CPI", color="red")
+    ax2.legend(loc="upper right")
+
+    plt.title("Tasa de Cambio JPY/USD vs. Inflación en Japón")
+    plt.show()
+
+# Análisis de la tasa de cambio
+def analyze_exchange_rate(df):
+    print("/n estadísticas de la tasa de cambio JPY/USD:")
+    print(df["close"].describe())
+
+# Ejecutar análisis de la tasa de cambío
+def analyze_exchange_rate(df):
+    print("/n Estadísticas de la tasa de cambío JPY/USD:")
+    print(df["close"].describe())
+
+#Ejecutar análisis
+Analyze_exchange_rate(df)
+plot_data(df, japan_cpi)
 
