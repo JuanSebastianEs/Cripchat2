@@ -9,7 +9,7 @@ data = response.json()
 tasa_actual = float(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
 print(f"💰 1 JPY = {tasa_actual} USD")
 
-# pne Usando pandas_detareader (Yahoo Finance)
+# Usando pandas_detareader (Yahoo Finance)
 
 import yfinance as yf
 
@@ -23,4 +23,15 @@ print(df.head())  # Muestra las primeras filas del dataframe
 from pandas_datareader import data as pdr
 
 japan_cpi = pdr.get_data_fred("CPALTT01JPQ659N", start="2000-01-01")
+
+# Grafique la tasa de cambio y la inflacion de japón
+Def plot_data(df, japan_cpi)
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    ax1.plot(df.index, df["close"], label = "Tasa de cambio JPY/USD", color="blue")
+    ax1.set_ylabel("Tasa de Cambio", color="blue")
+    ax1-set_xlabel("fecha")
+    ax1-legend(loc="upper left")
+
+    ax2 = ax1.twinx()
+    ax2.plot(df.index, df["close
 
