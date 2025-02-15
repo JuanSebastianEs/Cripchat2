@@ -9,7 +9,7 @@ data = response.json()
 tasa_actual = float(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
 print(f"💰 1 JPY = {tasa_actual} USD")
 
-# Usando pandas_detareader (Yahoo Finance)
+# pne Usando pandas_detareader (Yahoo Finance)
 
 import yfinance as yf
 
