@@ -68,55 +68,86 @@ def analyze_exchange_rate(df):
 analyze_exchange_rate(df)
 plot_data(df, japan_cpi)
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Line } from "react-chartjs-2";
-import "chart.js/auto";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import { GiCherryBlossom, GiJapan, GiGoldBar } from "react-icons/gi";
+import axios from "axios";
 
-const ExchangeRateDashboard = () => {
+export default function CripChatUI() {
   const [exchangeRate, setExchangeRate] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("https://your-api-url.com/latest")
-      .then((res) => res.json())
-      .then((data) => setExchangeRate(data.rate));
-
-    fetch("https://your-api-url.com/historical")
-      .then((res) => res.json())
-      .then((data) => setHistoricalData(data));
+    fetchExchangeRate();
+    fetchHistoricalData();
   }, []);
 
-  const chartData = {
-    labels: historicalData.map((d) => d.date),
-    datasets: [
-      {
-        label: "JPY/USD Exchange Rate",
-        data: historicalData.map((d) => d.rate),
-        borderColor: "blue",
-        fill: false,
-      },
-    ],
+  const fetchExchangeRate = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("https://api.cripchat.com/latest");
+      setExchangeRate(response.data.JPY.USD);
+    } catch (error) {
+      console.error("Error fetching exchange rate", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchHistoricalData = async () => {
+    try {
+      const response = await axios.get("https://api.cripchat.com/historical");
+      setHistoricalData(response.data);
+    } catch (error) {
+      console.error("Error fetching historical data", error);
+    }
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Exchange Rate Dashboard</h1>
-      <Card>
+    <motion.div
+      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-red-600 to-orange-400 p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1 }}
+    >
+      <h1 className="text-5xl font-bold text-white mb-6 flex items-center gap-3">
+        <GiJapan /> Bienvenido a CripChat Exchange!
+      </h1>
+      <Card className="p-6 bg-white shadow-2xl rounded-2xl w-full max-w-md text-center">
         <CardContent>
-          <p className="text-lg">Current JPY/USD Rate: {exchangeRate || "Loading..."}</p>
+          <p className="text-2xl font-semibold text-red-700 flex items-center justify-center gap-2">
+            <GiGoldBar /> Tasa de Cambio JPY/USD
+          </p>
+          <p className="text-4xl my-4 font-bold">
+            {loading ? "Cargando..." : exchangeRate ? `${exchangeRate.toFixed(4)} USD` : "Error"}
+          </p>
+          <Button onClick={fetchExchangeRate} className="mt-4 bg-red-600 hover:bg-red-700 text-white text-lg">
+            <GiCherryBlossom className="mr-2" />Actualizar
+          </Button>
         </CardContent>
       </Card>
-      <div className="mt-6">
-        <Line data={chartData} />
-      </div>
-      <Button className="mt-4" onClick={() => window.location.reload()}>
-        Refresh Data
-      </Button>
-    </div>
-  );
-};
 
-export default ExchangeRateDashboard;
+      <div className="mt-8 w-full max-w-2xl">
+        <h2 className="text-xl text-white font-semibold text-center mb-4">Historial de la Tasa de Cambio</h2>
+        <Card className="bg-white p-4 rounded-xl shadow-lg">
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={historicalData}>
+                <XAxis dataKey="date" stroke="#ff4d4d" />
+                <YAxis stroke="#ff4d4d" />
+                <Tooltip />
+                <Line type="monotone" dataKey="JPY.USD" stroke="#ff4d4d" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
+  );
+}
+
 
