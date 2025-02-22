@@ -1,5 +1,7 @@
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
+from pandas_datareader import data as pdr
 
 # Tasa actual JPY/USD con Alpha Vantage
 API_KEY = "MK5N3CCZRD0R1ROR"
@@ -18,6 +20,21 @@ df = yf.download("JPY=X", start="2018-01-01", end="2023-01-01")
 
 print(df.head())  # Muestra las primeras filas del dataframe
 
+#Función auxiliar para identificar la columna de precio de cierre
+def get_close_column(df):
+    """
+    Retorna el nombre de la columna que contiene el precio de cierre (Close o Adj Close).
+    Si no la encuentra, imprime un mensaje de error y retorna None.
+    """
+    if "Adj Close" in df.columns:
+        return "Adj Close"
+    elif "Close" in df.columns:
+        return "Close"
+    else:
+        print("Error: No se encontró la columna 'Close' o 'Adj Close'. "
+              f"Columnas disponibles: {df.columns.tolist()}")
+        return None
+
 
 # Desde FRED (ekemplo: inflación en Japón)
 from pandas_datareader import data as pdr
@@ -25,12 +42,12 @@ from pandas_datareader import data as pdr
 japan_cpi = pdr.get_data_fred("CPALTT01JPQ659N", start="2000-01-01")
 
 # Grafique la tasa de cambio y la inflacion de japón
-Def plot_data(df, japan_cpi)
+def plot_data(df, japan_cpi):
     fig, ax1 = plt.subplots(figsize=(12, 6))
-    ax1.plot(df.index, df["close"], label = "Tasa de cambio JPY/USD", color="blue")
+    ax1.plot(df.index, df["Adj close"], label = "Tasa de cambio JPY/USD", color="blue")
     ax1.set_ylabel("Tasa de Cambio", color="blue")
-    ax1-set_xlabel("fecha")
-    ax1-legend(loc="upper left")
+    ax1.set_xlabel("fecha")
+    ax1.legend(loc="upper left")
 
     ax2 = ax1.twinx()
     ax2.plot(japan_cpi.index, japan_cpi, label="Inflación en Japón (CPI)", color="red")
@@ -42,15 +59,17 @@ Def plot_data(df, japan_cpi)
 
 # Análisis de la tasa de cambio
 def analyze_exchange_rate(df):
-    print("/n estadísticas de la tasa de cambio JPY/USD:")
+    print("\n estadísticas de la tasa de cambio JPY/USD:")
     print(df["close"].describe())
 
 # Ejecutar análisis de la tasa de cambío
 def analyze_exchange_rate(df):
-    print("/n Estadísticas de la tasa de cambío JPY/USD:")
-    print(df["close"].describe())
+  close_col = get_close_column(df)
+  if close_col is not None:
+    return
+    print("\nEstadísticas de la tasa de cambio JPY/USD:")
+    print(df[close_col].describe())
 
 #Ejecutar análisis
-Analyze_exchange_rate(df)
+analyze_exchange_rate(df)
 plot_data(df, japan_cpi)
-
