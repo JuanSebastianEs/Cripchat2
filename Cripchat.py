@@ -67,3 +67,56 @@ def analyze_exchange_rate(df):
 # Ejecutar análisis
 analyze_exchange_rate(df)
 plot_data(df, japan_cpi)
+
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Line } from "react-chartjs-2";
+import "chart.js/auto";
+
+const ExchangeRateDashboard = () => {
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [historicalData, setHistoricalData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://your-api-url.com/latest")
+      .then((res) => res.json())
+      .then((data) => setExchangeRate(data.rate));
+
+    fetch("https://your-api-url.com/historical")
+      .then((res) => res.json())
+      .then((data) => setHistoricalData(data));
+  }, []);
+
+  const chartData = {
+    labels: historicalData.map((d) => d.date),
+    datasets: [
+      {
+        label: "JPY/USD Exchange Rate",
+        data: historicalData.map((d) => d.rate),
+        borderColor: "blue",
+        fill: false,
+      },
+    ],
+  };
+
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">Exchange Rate Dashboard</h1>
+      <Card>
+        <CardContent>
+          <p className="text-lg">Current JPY/USD Rate: {exchangeRate || "Loading..."}</p>
+        </CardContent>
+      </Card>
+      <div className="mt-6">
+        <Line data={chartData} />
+      </div>
+      <Button className="mt-4" onClick={() => window.location.reload()}>
+        Refresh Data
+      </Button>
+    </div>
+  );
+};
+
+export default ExchangeRateDashboard;
+
